@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Exambro Web Pro - Portal Ujian Aman</title>
+
+  <!-- Library HTML5 QR Code (Versi Stabil via jsDelivr) -->
+  <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js" defer></script>
+
+  <style>
+    :root {
+      --bg-dark: #070b14;
+      --bg-card: rgba(17, 24, 39, 0.85);
+      --bg-input: #0b1120;
+      --border: rgba(148, 163, 184, 0.18);
+      --border-focus: #6366f1;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --primary: #4f46e5;
+      --primary-glow: rgba(79, 70, 229, 0.45);
+      --success: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --radius-lg: 20px;
+      --radius-md: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      min-height: 100vh;
+      min-height: 100dvh;
+      background-color: var(--bg-dark);
+      background-image:
+        radial-gradient(circle at 15% 10%, rgba(79, 70, 229, 0.18), transparent 40%),
+        radial-gradient(circle at 85% 90%, rgba(16, 185, 129, 0.12), transparent 40%);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+      overflow-x: hidden;
+      overscroll-behavior: none; /* Mencegah pull-to-refresh di iOS & Android */
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+    }
+
+    /* Wajib 16px agar iPhone Safari tidak auto-zoom saat mengetik */
+    input, button, select, textarea {
+      font-family: inherit;
+      font-size: 16px !important;
+      color: inherit;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
+    }
+
+    .hidden { display: none !important; }
+
+    /* =========================================
+       HALAMAN BERANDA
+       ========================================= */
+    .container {
+      width: 100%;
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 20px 16px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header.app-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 18px;
+      margin-bottom: 22px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #6366f1, #3b82f6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 20px var(--primary-glow);
+    }
+
+    .brand-title {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+    }
+
+    .brand-subtitle {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .card {
+      background: var(--bg-card);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.6);
+      margin-bottom: 18px;
+    }
+
+    .card-title {
+      font-size: 21px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .card-subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    @media (min-width: 600px) {
+      .form-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    .form-group { margin-bottom: 16px; }
+
+    label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: #cbd5e1;
+      margin-bottom: 6px;
+    }
+
+    .input-control {
+      width: 100%;
+      background-color: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 13px 14px;
+      color: #fff;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .input-control:focus {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+    }
+
+    .input-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    .input-group .input-control { flex: 1; }
+
+    /* =========================================
+       TOMBOL
+       ========================================= */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 16px;
+      border-radius: var(--radius-md);
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.15s, opacity 0.15s;
+      touch-action: manipulation;
+    }
+
+    .btn:active { transform: scale(0.97); }
+    .btn-primary {
+      background: linear-gradient(135deg, #4f46e5, #6366f1);
+      color: #fff;
+      box-shadow: 0 4px 14px var(--primary-glow);
+    }
+    .btn-success {
+      background: linear-gradient(135deg, #059669, #10b981);
+      color: #fff;
+      width: 100%;
+      padding: 16px;
+      box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+    }
+    .btn-danger {
+      background: linear-gradient(135deg, #dc2626, #ef4444);
+      color: #fff;
+    }
+    .btn-secondary {
+      background: rgba(30, 41, 59, 0.8);
+      color: #e2e8f0;
+      border: 1px solid var(--border);
+    }
+    .btn-icon { padding: 9px; border-radius: 10px; }
+
+    .banner-alert {
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      color: #fde68a;
+      padding: 12px 14px;
+      border-radius: var(--radius-md);
+      font-size: 12px;
+      line-height: 1.5;
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    /* =========================================
+       MODE UJIAN AKTIF (OPTIMAL UNTUK IPHONE SAFARI)
+       ========================================= */
+    #examScreen {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      height: 100dvh;
+      background-color: var(--bg-dark);
+      z-index: 99;
+      display: flex;
+      flex-direction: column;
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    .exam-header {
+      height: 54px;
+      flex-shrink: 0;
+      background: rgba(15, 23, 42, 0.96);
+      border-bottom: 1px solid var(--border);
+      padding: 0 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .exam-student-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.5);
+      color: #6ee7b7;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .pulse-dot {
+      width: 6px;
+      height: 6px;
+      background: #34d399;
+      border-radius: 50%;
+      animation: pulse 1.4s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.3; transform: scale(1.35); }
+    }
+
+    .student-text {
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .exam-tools {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .timer-box {
+      background: #020617;
+      border: 1px solid var(--border);
+      padding: 5px 9px;
+      border-radius: 8px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12px;
+      font-weight: 700;
+      color: #fbbf24;
+    }
+
+    .violation-badge {
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid var(--danger);
+      color: #fca5a5;
+      padding: 4px 8px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    /* FIX PENTING IPHONE: Wrapper flex:1 + min-height:0 + iframe position:absolute */
+    .iframe-container {
+      flex: 1;
+      min-height: 0;
+      width: 100%;
+      position: relative;
+      background-color: #ffffff;
+      overflow: hidden;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    iframe#examIframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+      background-color: #ffffff;
+    }
+
+    /* Loading Overlay di atas Iframe */
+    #iframeLoader {
+      position: absolute;
+      inset: 0;
+      background: #0f172a;
+      color: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+      z-index: 10;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(99, 102, 241, 0.25);
+      border-top-color: #6366f1;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 14px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* =========================================
+       MODAL & LOCK OVERLAY
+       ========================================= */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.88);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .overlay-danger {
+      background: rgba(69, 10, 10, 0.96);
+    }
+
+    .modal-box {
+      background: #0f172a;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 460px;
+      padding: 22px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+      max-height: 90dvh;
+      overflow-y: auto;
+    }
+
+    .modal-danger {
+      border: 2px solid var(--danger);
+      text-align: center;
+    }
+
+    .alarm-icon-box {
+      width: 58px;
+      height: 58px;
+      background: rgba(239, 68, 68, 0.2);
+      color: #f87171;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 12px;
+      animation: bounce 0.9s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-7px); }
+    }
+
+    .log-box {
+      background: #020617;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+      max-height: 110px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 11px;
+      text-align: left;
+      color: #cbd5e1;
+      margin: 12px 0;
+    }
+
+    .log-item {
+      padding: 4px 0;
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+    }
+
+    .keypad-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .keypad-btn {
+      background: #1e293b;
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 14px;
+      font-weight: 700;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .keypad-btn:active { background: var(--primary); }
+
+    #qrStatus {
+      font-size: 12px;
+      color: #94a3b8;
+      margin-bottom: 10px;
+      min-height: 18px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 1. HALAMAN BERANDA -->
+  <div id="startScreen" class="container">
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <path d="m9 12 2 2 4-4"/>
+          </svg>
+        </div>
+        <div>
+          <div class="brand-title">Exambro Web Pro</div>
+          <div class="brand-subtitle">Portal Ujian Aman iOS & Android</div>
+        </div>
+      </div>
+
+      <button onclick="openSettingsModal()" class="btn btn-secondary" style="padding: 9px 14px; font-size: 13px !important;">
+        Pengawas
+      </button>
+    </header>
+
+    <div id="httpsNotice" class="banner-alert hidden">
+      <div>
+        <strong>Peringatan Kamera:</strong> Halaman tidak dibuka via <strong>HTTPS</strong>. Browser HP (khususnya iPhone) memblokir kamera langsung jika bukan HTTPS. Gunakan tombol <strong>Upload Foto QR</strong> atau host file ini di GitHub Pages / Netlify / Vercel (gratis & otomatis HTTPS).
+      </div>
+    </div>
+
+    <main>
+      <div class="card">
+        <div class="card-title">Masuk Ruang Ujian</div>
+        <div class="card-subtitle">Lengkapi identitas dan masukkan link Google Form resmi dari pengawas.</div>
+
+        <form id="startForm" onsubmit="event.preventDefault(); initAndStartExam();">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="studentName">Nama Lengkap *</label>
+              <input type="text" id="studentName" class="input-control" required placeholder="Contoh: Budi Santoso" autocomplete="off">
+            </div>
+
+            <div class="form-group">
+              <label for="studentClass">Kelas / No. Peserta *</label>
+              <input type="text" id="studentClass" class="input-control" required placeholder="Contoh: IX-A / 012" autocomplete="off">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <label for="formUrl" style="margin-bottom:0;">Link Google Form Ujian *</label>
+              <button type="button" onclick="fillDemoLink()" style="background:none; border:none; color:#818cf8; cursor:pointer; font-size:12px !important; text-decoration:underline;">
+                + Tes Link Demo
+              </button>
+            </div>
+
+            <div class="input-group">
+              <input type="text" id="formUrl" class="input-control" required placeholder="https://docs.google.com/forms/d/e/.../viewform" autocomplete="off">
+              <button type="button" onclick="openQRModal()" class="btn btn-primary" style="flex-shrink:0;">
+                Scan QR
+              </button>
+            </div>
+          </div>
+
+          <div style="font-size:11.5px; color:var(--text-muted); margin-bottom:18px; line-height:1.5;">
+            <strong>Penting:</strong> Gunakan link panjang <code style="color:#a5b4fc;">docs.google.com/forms/...</code>. Link pendek <code style="color:#fca5a5;">forms.gle</code> atau website biasa yang memblokir iframe tidak dapat ditampilkan di dalam browser ujian.
+          </div>
+
+          <button type="submit" class="btn btn-success">
+            MASUK & MULAI UJIAN
+          </button>
+        </form>
+      </div>
+    </main>
+
+    <footer style="text-align:center; font-size:12px; color:var(--text-muted); padding:10px 0;">
+      Exambro Web Pro &copy; 2026 &bull; Anti-Cheat &bull; iOS Safari Ready
+    </footer>
+  </div>
+
+  <!-- 2. MODE UJIAN AKTIF -->
+  <div id="examScreen" class="hidden">
+    <header class="exam-header">
+      <div class="exam-student-info">
+        <div class="status-badge">
+          <div class="pulse-dot"></div>
+          <span>UJIAN</span>
+        </div>
+        <div class="student-text">
+          <span id="displayStudentName">Siswa</span>
+          <span style="color:var(--text-muted); margin:0 3px;">•</span>
+          <span id="displayStudentClass" style="color:var(--text-muted);">Kelas</span>
+        </div>
+      </div>
+
+      <div class="exam-tools">
+        <div class="timer-box" id="timerDisplay">00:00:00</div>
+
+        <div id="violationBadge" class="violation-badge hidden">
+          ⚠ <span id="violationCountBadge">0</span>
+        </div>
+
+        <button onclick="reloadExamIframe()" class="btn btn-secondary btn-icon" title="Muat Ulang Soal">
+          ↻
+        </button>
+
+        <button onclick="openFinishModal()" class="btn btn-danger" style="padding:7px 11px; font-size:12px !important;">
+          Selesai
+        </button>
+      </div>
+    </header>
+
+    <div class="iframe-container">
+      <!-- Loader sementara soal dimuat -->
+      <div id="iframeLoader">
+        <div class="spinner"></div>
+        <div style="font-weight:700; margin-bottom:6px;">Memuat Lembar Soal...</div>
+        <div id="iframeSlowHint" class="hidden" style="font-size:12px; color:#fca5a5; max-width:320px; line-height:1.5; margin-top:8px;">
+          Layar masih putih? Pastikan koneksi stabil dan link yang dipakai adalah <strong>link panjang docs.google.com/forms</strong> (bukan forms.gle atau website yang memblokir iframe).
+        </div>
+      </div>
+
+      <!-- TANPA ATRIBUT SANDBOX AGAR IPHONE SAFARI BISA RENDER GOOGLE FORM -->
+      <iframe
+        id="examIframe"
+        allow="camera; microphone; fullscreen"
+        referrerpolicy="no-referrer-when-downgrade"
+        onload="onIframeLoaded()">
+      </iframe>
+    </div>
+  </div>
+
+  <!-- 3. MODAL SCANNER QR -->
+  <div id="qrModal" class="overlay hidden">
+    <div class="modal-box" style="text-align:center;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <h3 style="font-size:17px; font-weight:700;">Pindai QR Code Soal</h3>
+        <button onclick="closeQRModal()" class="btn btn-secondary btn-icon" style="border:none;">✕</button>
+      </div>
+
+      <div id="qrStatus">Menyiapkan kamera...</div>
+
+      <div id="qr-reader" style="width:100%; min-height:240px; background:#000; border-radius:12px; overflow:hidden; margin-bottom:14px;"></div>
+
+      <div style="border-top:1px solid var(--border); padding-top:14px;">
+        <div style="font-size:12px; color:var(--text-muted); margin-bottom:8px;">Kamera tidak muncul atau diblokir? Pilih dari galeri:</div>
+        <label class="btn btn-secondary" style="font-size:13px !important; cursor:pointer; width:100%;">
+          Upload Foto / Screenshot QR
+          <input type="file" id="qrFileInput" accept="image/*" style="display:none;" onchange="handleQRFileInput(event)">
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. OVERLAY KUNCI PELANGGARAN -->
+  <div id="violationOverlay" class="overlay overlay-danger hidden">
+    <div class="modal-box modal-danger">
+      <div class="alarm-icon-box">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+          <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+      </div>
+
+      <div style="font-size:22px; font-weight:900; color:#ef4444; letter-spacing:1px;">UJIAN TERKUNCI!</div>
+      <div style="font-size:12px; color:#fca5a5; margin-top:4px;">Panggil pengawas untuk membuka kunci</div>
+
+      <div style="background:rgba(0,0,0,0.45); border:1px solid rgba(239,68,68,0.4); border-radius:10px; padding:10px; margin:12px 0; text-align:left;">
+        <div style="font-size:11px; color:var(--text-muted);">Pelanggaran Terakhir:</div>
+        <div id="violationReason" style="font-size:13px; font-weight:700; color:#f87171; margin-top:2px;">-</div>
+      </div>
+
+      <div class="log-box" id="violationLogList"></div>
+
+      <form onsubmit="event.preventDefault(); unlockExamWithPin();">
+        <label for="unlockPinInput" style="text-align:center;">PIN Pengawas:</label>
+        <input type="password" id="unlockPinInput" class="input-control" readonly placeholder="••••••" style="text-align:center; font-weight:800; letter-spacing:5px;">
+        <div id="unlockError" style="color:#f87171; font-size:12px; margin-top:6px;" class="hidden">PIN Pengawas Salah!</div>
+
+        <div class="keypad-grid">
+          <button type="button" class="keypad-btn" onclick="appendKeypad('1')">1</button>
+          <button type="button" class="keypad-btn" onclick="appendKeypad('2')">2</button>
+          <button type="button" class="keypad-btn" onclick="appendKeypad('3')">3</button>
+          <button type="button" class="keypad-btn" onclick="appendKeypad('4')">4</button>
+          <button type="button" class="keypad-btn" onclick="appendKeypad('5')">5</button>
+          <button type="button" class="keypad-btn" onclick="appendKeypad('6')">6</button>
+          <button type="button" class="keypad-btn" onclick="appendKeypad('7')">7</button>
+          <button type="button" class="keypad-btn" onclick="appendKeypad('8')">8</button>
+          <button type="button" class="keypad-btn" onclick="appendKeypad('9')">9</button>
+          <button type="button" class="keypad-btn" onclick="clearKeypad()" style="color:#f87171;">C</button>
+          <button type="button" class="keypad-btn" onclick="appendKeypad('0')">0</button>
+          <button type="submit" class="keypad-btn" style="background:var(--danger);">OK</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 5. MODAL SELESAI UJIAN -->
+  <div id="finishModal" class="overlay hidden">
+    <div class="modal-box" style="text-align:center;">
+      <h3 style="font-size:18px; font-weight:700; margin-bottom:8px;">Selesaikan Ujian?</h3>
+      <p style="font-size:13px; color:var(--text-muted); margin-bottom:16px; line-height:1.5;">
+        Pastikan Anda sudah menekan tombol <strong style="color:#34d399;">KIRIM / SUBMIT</strong> pada Google Form sebelum keluar.
+      </p>
+
+      <form onsubmit="event.preventDefault(); confirmFinishExam();">
+        <div id="finishPinContainer">
+          <label for="finishPinInput">PIN Pengawas:</label>
+          <input type="password" id="finishPinInput" class="input-control" placeholder="Masukkan PIN" style="text-align:center; font-weight:700; margin-bottom:10px;">
+          <div id="finishError" style="color:#f87171; font-size:12px; margin-bottom:10px;" class="hidden">PIN Salah!</div>
+        </div>
+
+        <div style="display:flex; gap:10px;">
+          <button type="button" onclick="closeFinishModal()" class="btn btn-secondary" style="flex:1;">Batal</button>
+          <button type="submit" class="btn btn-danger" style="flex:1;">Ya, Selesai</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 6. MODAL PENGATURAN PENGAWAS -->
+  <div id="settingsModal" class="overlay hidden">
+    <div class="modal-box">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h3 style="font-size:18px; font-weight:700;">Pengaturan Pengawas</h3>
+        <button onclick="closeSettingsModal()" class="btn btn-secondary btn-icon" style="border:none;">✕</button>
+      </div>
+
+      <div id="settingsAuthBox">
+        <label for="authPinInput">PIN Pengawas (Default: 123456):</label>
+        <input type="password" id="authPinInput" class="input-control" placeholder="PIN Pengawas" style="text-align:center; margin-bottom:12px;">
+        <button onclick="verifySettingsPin()" class="btn btn-primary" style="width:100%;">Masuk Pengaturan</button>
+      </div>
+
+      <div id="settingsContentBox" class="hidden">
+        <div class="form-group">
+          <label for="cfgPin">Ubah PIN Pengawas</label>
+          <input type="password" id="cfgPin" class="input-control">
+        </div>
+
+        <div class="form-group">
+          <label for="cfgTimer">Durasi Ujian (Menit, 0 = Tanpa Batas)</label>
+          <input type="number" id="cfgTimer" class="input-control" min="0">
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:10px; margin:16px 0;">
+          <label style="display:flex; align-items:center; gap:10px; font-size:13px; text-transform:none; cursor:pointer;">
+            <input type="checkbox" id="cfgSiren" style="width:18px; height:18px;">
+            <span>Bunyikan Alarm Sirene Saat Melanggar</span>
+          </label>
+          <label style="display:flex; align-items:center; gap:10px; font-size:13px; text-transform:none; cursor:pointer;">
+            <input type="checkbox" id="cfgDetectTab" style="width:18px; height:18px;">
+            <span>Kunci Jika Pindah Tab / Aplikasi / Freeze</span>
+          </label>
+          <label style="display:flex; align-items:center; gap:10px; font-size:13px; text-transform:none; cursor:pointer;">
+            <input type="checkbox" id="cfgDetectResize" style="width:18px; height:18px;">
+            <span>Kunci Jika Split-Screen / Resize Layar</span>
+          </label>
+          <label style="display:flex; align-items:center; gap:10px; font-size:13px; text-transform:none; cursor:pointer;">
+            <input type="checkbox" id="cfgRequirePinFinish" style="width:18px; height:18px;">
+            <span>Wajib PIN Pengawas Untuk Keluar Ujian</span>
+          </label>
+        </div>
+
+        <button onclick="saveSupervisorSettings()" class="btn btn-success" style="padding:12px;">Simpan Pengaturan</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY_STATE = 'exambro_active_session_v2';
+    const STORAGE_KEY_CFG = 'exambro_cfg_v2';
+
+    let supervisorPin = localStorage.getItem('exambro_pin') || '123456';
+    let settings = JSON.parse(localStorage.getItem(STORAGE_KEY_CFG)) || {
+      examDurationMinutes: 0,
+      sirenSound: true,
+      detectTab: true,
+      detectResize: true,
+      requirePinFinish: true
+    };
+
+    let examState = {
+      isActive: false,
+      isLocked: false,
+      studentName: '',
+      studentClass: '',
+      formUrl: '',
+      secondsElapsed: 0,
+      violationCount: 0,
+      violationLogs: [],
+      initialWidth: window.innerWidth
+    };
+
+    let timerInterval = null;
+    let heartbeatInterval = null;
+    let lastHeartbeat = Date.now();
+    let slowHintTimeout = null;
+    let wakeLock = null;
+
+    let audioCtx = null;
+    let sirenOsc = null;
+    let sirenGain = null;
+    let sirenInterval = null;
+    let html5QrCode = null;
+
+    // --- INISIALISASI & ANTI-REFRESH RESTORE ---
+    window.addEventListener('DOMContentLoaded', () => {
+      const isSecure = window.location.protocol === 'https:' ||
+                       window.location.hostname === 'localhost' ||
+                       window.location.hostname === '127.0.0.1';
+      if (!isSecure) {
+        document.getElementById('httpsNotice').classList.remove('hidden');
+      }
+
+      // Cek apakah siswa me-refresh halaman saat ujian sedang aktif!
+      const saved = localStorage.getItem(STORAGE_KEY_STATE);
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (parsed && parsed.isActive) {
+            examState = parsed;
+            examState.initialWidth = window.innerWidth;
+            resumeExamUI();
+            triggerViolation("Mencoba Refresh / Muat Ulang Halaman Saat Ujian");
+          }
+        } catch (e) {
+          localStorage.removeItem(STORAGE_KEY_STATE);
+        }
+      }
+    });
+
+    function saveSessionState() {
+      if (examState.isActive) {
+        localStorage.setItem(STORAGE_KEY_STATE, JSON.stringify(examState));
+      } else {
+        localStorage.removeItem(STORAGE_KEY_STATE);
+      }
+    }
+
+    function fillDemoLink() {
+      // Link contoh form Google resmi yang mengizinkan embed
+      document.getElementById('formUrl').value = 'https://docs.google.com/forms/d/e/1FAIpQLSfD_9x5Z2b8w0x_DEMO/viewform';
+      alert("Link demo dimasukkan. Untuk uji coba nyata, tempelkan link panjang Google Form Anda sendiri.");
+    }
+
+    function unlockAudioContext() {
+      if (!audioCtx) {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (AC) audioCtx = new AC();
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume().catch(() => {});
+      }
+    }
+
+    async function requestWakeLock() {
+      try {
+        if ('wakeLock' in navigator) {
+          wakeLock = await navigator.wakeLock.request('screen');
+        }
+      } catch (e) {}
+    }
+
+    function normalizeUrl(raw) {
+      let url = raw.trim();
+      if (!/^https?:\/\//i.test(url)) {
+        url = 'https://' + url;
+      }
+      // Tambahkan embedded=true khusus Google Form panjang
+      if (url.includes('docs.google.com/forms') && !url.includes('embedded=true')) {
+        url += (url.includes('?') ? '&' : '?') + 'embedded=true';
+      }
+      return url;
+    }
+
+    // --- MULAI UJIAN ---
+    function initAndStartExam() {
+      unlockAudioContext();
+
+      const name = document.getElementById('studentName').value.trim();
+      const cls = document.getElementById('studentClass').value.trim();
+      const rawUrl = document.getElementById('formUrl').value.trim();
+
+      if (!name || !cls || !rawUrl) {
+        alert("Mohon lengkapi Nama, Kelas, dan Link Soal!");
+        return;
+      }
+
+      if (rawUrl.includes('forms.gle/')) {
+        const lanjut = confirm(
+          "PERINGATAN:\nLink pendek 'forms.gle' sering diblokir oleh iPhone/Safari dan menyebabkan layar putih.\n\n" +
+          "Sangat disarankan membuka link tersebut dulu lalu salin link panjangnya (docs.google.com/forms/...).\n\nTetap lanjutkan?"
+        );
+        if (!lanjut) return;
+      }
+
+      examState = {
+        isActive: true,
+        isLocked: false,
+        studentName: name,
+        studentClass: cls,
+        formUrl: normalizeUrl(rawUrl),
+        secondsElapsed: 0,
+        violationCount: 0,
+        violationLogs: [],
+        initialWidth: window.innerWidth
+      };
+
+      saveSessionState();
+      resumeExamUI();
+      requestFullscreenSafe();
+      requestWakeLock();
+    }
+
+    function resumeExamUI() {
+      document.getElementById('displayStudentName').innerText = examState.studentName;
+      document.getElementById('displayStudentClass').innerText = examState.studentClass;
+      updateViolationBadge();
+
+      // Tampilkan loader & muat iframe
+      showIframeLoader();
+      document.getElementById('examIframe').src = examState.formUrl;
+
+      document.getElementById('startScreen').classList.add('hidden');
+      document.getElementById('examScreen').classList.remove('hidden');
+
+      // Kunci tombol Back browser
+      history.pushState(null, null, location.href);
+
+      startExamTimer();
+      startHeartbeat();
+    }
+
+    function showIframeLoader() {
+      const loader = document.getElementById('iframeLoader');
+      const hint = document.getElementById('iframeSlowHint');
+      loader.classList.remove('hidden');
+      hint.classList.add('hidden');
+      clearTimeout(slowHintTimeout);
+      slowHintTimeout = setTimeout(() => {
+        hint.classList.remove('hidden');
+      }, 5000);
+    }
+
+    function onIframeLoaded() {
+      clearTimeout(slowHintTimeout);
+      document.getElementById('iframeLoader').classList.add('hidden');
+    }
+
+    function reloadExamIframe() {
+      if (confirm("Muat ulang lembar soal?")) {
+        showIframeLoader();
+        document.getElementById('examIframe').src = examState.formUrl;
+      }
+    }
+
+    function requestFullscreenSafe() {
+      const el = document.documentElement;
+      if (el.requestFullscreen) {
+        el.requestFullscreen().catch(() => {});
+      } else if (el.webkitRequestFullscreen) {
+        el.webkitRequestFullscreen();
+      }
+    }
+
+    // --- TIMER & HEARTBEAT (DETEKSI APP-SWITCHER IPHONE) ---
+    function startExamTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        if (!examState.isActive || examState.isLocked) return;
+
+        examState.secondsElapsed++;
+        if (examState.secondsElapsed % 5 === 0) saveSessionState();
+
+        let displaySecs = examState.secondsElapsed;
+        if (settings.examDurationMinutes > 0) {
+          const total = settings.examDurationMinutes * 60;
+          displaySecs = Math.max(0, total - examState.secondsElapsed);
+          if (displaySecs <= 0) {
+            clearInterval(timerInterval);
+            alert("Waktu Ujian Habis!");
+            openFinishModal();
+          }
+        }
+
+        const h = String(Math.floor(displaySecs / 3600)).padStart(2, '0');
+        const m = String(Math.floor((displaySecs % 3600) / 60)).padStart(2, '0');
+        const s = String(displaySecs % 60).padStart(2, '0');
+        document.getElementById('timerDisplay').innerText = `${h}:${m}:${s}`;
+      }, 1000);
+    }
+
+    function startHeartbeat() {
+      if (heartbeatInterval) clearInterval(heartbeatInterval);
+      lastHeartbeat = Date.now();
+      heartbeatInterval = setInterval(() => {
+        const now = Date.now();
+        const delta = now - lastHeartbeat;
+        lastHeartbeat = now;
+        // Jika jeda > 4 detik berarti browser sempat di-suspend / app-switcher dibuka
+        if (examState.isActive && !examState.isLocked && settings.detectTab && delta > 4000) {
+          triggerViolation("Browser Dijeda / Membuka App-Switcher");
+        }
+      }, 1000);
+    }
+
+    // --- ANTI-CHEAT LISTENERS ---
+    window.addEventListener('popstate', () => {
+      if (examState.isActive) {
+        history.pushState(null, null, location.href);
+        if (!examState.isLocked) {
+          triggerViolation("Mencoba Menekan Tombol Kembali (Back)");
+        }
+      }
+    });
+
+    window.addEventListener('beforeunload', (e) => {
+      if (examState.isActive) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    });
+
+    document.addEventListener('contextmenu', e => { if (examState.isActive) e.preventDefault(); });
+    document.addEventListener('selectstart', e => { if (examState.isActive) e.preventDefault(); });
+
+    document.addEventListener('keydown', e => {
+      if (!examState.isActive) return;
+      const isCtrl = e.ctrlKey || e.metaKey;
+      const k = e.key.toLowerCase();
+      if (e.key === 'F12' || (isCtrl && ['c','v','u','p','a','s','r'].includes(k))) {
+        e.preventDefault();
+        triggerViolation("Pintasan Keyboard Terlarang (" + e.key + ")");
+      }
+    });
+
+    document.addEventListener('visibilitychange', () => {
+      if (examState.isActive && !examState.isLocked && settings.detectTab && document.hidden) {
+        triggerViolation("Meninggalkan Layar Ujian / Pindah Aplikasi");
+      }
+    });
+
+    window.addEventListener('pagehide', () => {
+      if (examState.isActive && !examState.isLocked && settings.detectTab) {
+        triggerViolation("Meninggalkan Halaman Ujian (Page Hide)");
+      }
+    });
+
+    window.addEventListener('resize', () => {
+      if (!examState.isActive || examState.isLocked || !settings.detectResize) return;
+      const shrinkRatio = (examState.initialWidth - window.innerWidth) / examState.initialWidth;
+      if (shrinkRatio > 0.22) {
+        triggerViolation("Terdeteksi Split-Screen / Perubahan Lebar Layar");
+      }
+    });
+
+    // --- EKSEKUSI PELANGGARAN ---
+    function triggerViolation(reason) {
+      if (!examState.isActive) return;
+      const alreadyLocked = examState.isLocked;
+      examState.isLocked = true;
+      examState.violationCount++;
+      const timeStr = new Date().toLocaleTimeString('id-ID');
+      examState.violationLogs.push({ reason, timeStr });
+      saveSessionState();
+
+      document.getElementById('violationReason').innerText = reason;
+      updateViolationBadge();
+
+      const logList = document.getElementById('violationLogList');
+      logList.innerHTML = examState.violationLogs.map((item, i) =>
+        `<div class="log-item">#${i + 1} [${item.timeStr}] ${item.reason}</div>`
+      ).join('');
+
+      document.getElementById('unlockPinInput').value = '';
+      document.getElementById('unlockError').classList.add('hidden');
+      document.getElementById('violationOverlay').classList.remove('hidden');
+
+      if (!alreadyLocked) startSirenAlarm();
+    }
+
+    function updateViolationBadge() {
+      const badge = document.getElementById('violationBadge');
+      document.getElementById('violationCountBadge').innerText = examState.violationCount;
+      if (examState.violationCount > 0) badge.classList.remove('hidden');
+      else badge.classList.add('hidden');
+    }
+
+    function appendKeypad(v) { document.getElementById('unlockPinInput').value += v; }
+    function clearKeypad() { document.getElementById('unlockPinInput').value = ''; }
+
+    function unlockExamWithPin() {
+      const pin = document.getElementById('unlockPinInput').value.trim();
+      if (pin === supervisorPin) {
+        stopSirenAlarm();
+        document.getElementById('violationOverlay').classList.add('hidden');
+        examState.isLocked = false;
+        lastHeartbeat = Date.now();
+        saveSessionState();
+        requestFullscreenSafe();
+      } else {
+        document.getElementById('unlockError').classList.remove('hidden');
+        document.getElementById('unlockPinInput').value = '';
+      }
+    }
+
+    // --- ALARM SIRENE ---
+    function startSirenAlarm() {
+      if (!settings.sirenSound) return;
+      unlockAudioContext();
+      stopSirenAlarm();
+      if (!audioCtx) return;
+
+      try {
+        sirenOsc = audioCtx.createOscillator();
+        sirenGain = audioCtx.createGain();
+        sirenOsc.type = 'sawtooth';
+        sirenOsc.frequency.value = 880;
+        sirenGain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+        sirenOsc.connect(sirenGain);
+        sirenGain.connect(audioCtx.destination);
+        sirenOsc.start();
+
+        let toggle = false;
+        sirenInterval = setInterval(() => {
+          if (sirenOsc && audioCtx) {
+            sirenOsc.frequency.setValueAtTime(toggle ? 880 : 1240, audioCtx.currentTime);
+            toggle = !toggle;
+          }
+        }, 280);
+      } catch (e) {}
+    }
+
+    function stopSirenAlarm() {
+      if (sirenInterval) { clearInterval(sirenInterval); sirenInterval = null; }
+      if (sirenOsc) {
+        try { sirenOsc.stop(); sirenOsc.disconnect(); } catch (e) {}
+        sirenOsc = null;
+      }
+    }
+
+    // --- FITUR QR SCANNER (DIPERBAIKI TOTAL UNTUK IOS & ANDROID) ---
+    function setQrStatus(msg, isError = false) {
+      const el = document.getElementById('qrStatus');
+      el.innerText = msg;
+      el.style.color = isError ? '#fca5a5' : '#94a3b8';
+    }
+
+    async function stopQrCameraSafely() {
+      if (html5QrCode) {
+        try {
+          if (html5QrCode.isScanning) {
+            await html5QrCode.stop();
+          }
+          await html5QrCode.clear();
+        } catch (e) {}
+      }
+    }
+
+    async function openQRModal() {
+      document.getElementById('qrModal').classList.remove('hidden');
+
+      if (typeof Html5Qrcode === 'undefined') {
+        setQrStatus("Library QR belum termuat. Periksa koneksi internet Anda.", true);
+        return;
+      }
+
+      setQrStatus("Meminta izin kamera...");
+      if (!html5QrCode) {
+        html5QrCode = new Html5Qrcode("qr-reader");
+      }
+
+      await stopQrCameraSafely();
+
+      try {
+        await html5QrCode.start(
+          { facingMode: "environment" },
+          {
+            fps: 10,
+            qrbox: (w, h) => {
+              const size = Math.min(w, h) * 0.72;
+              return { width: Math.max(160, size), height: Math.max(160, size) };
+            }
+          },
+          (decodedText) => {
+            document.getElementById('formUrl').value = decodedText.trim();
+            closeQRModal();
+          },
+          () => {}
+        );
+        setQrStatus("Arahkan kamera ke QR Code soal...");
+      } catch (err) {
+        setQrStatus("Kamera tidak dapat diakses (butuh HTTPS & izin kamera). Gunakan Upload Foto QR di bawah.", true);
+      }
+    }
+
+    async function closeQRModal() {
+      await stopQrCameraSafely();
+      document.getElementById('qrModal').classList.add('hidden');
+    }
+
+    async function handleQRFileInput(evt) {
+      const file = evt.target.files[0];
+      if (!file) return;
+
+      if (typeof Html5Qrcode === 'undefined') {
+        alert("Library QR belum termuat.");
+        return;
+      }
+
+      setQrStatus("Membaca gambar QR...");
+      if (!html5QrCode) html5QrCode = new Html5Qrcode("qr-reader");
+
+      // WAJIB hentikan kamera dulu sebelum scanFile
+      await stopQrCameraSafely();
+
+      try {
+        const text = await html5QrCode.scanFile(file, true);
+        document.getElementById('formUrl').value = text.trim();
+        evt.target.value = '';
+        closeQRModal();
+      } catch (e) {
+        evt.target.value = '';
+        setQrStatus("QR Code tidak terdeteksi di gambar tersebut. Coba gambar lain.", true);
+      }
+    }
+
+    // --- SELESAI UJIAN & PENGATURAN ---
+    function openFinishModal() {
+      document.getElementById('finishError').classList.add('hidden');
+      document.getElementById('finishPinInput').value = '';
+      document.getElementById('finishPinContainer').classList.toggle('hidden', !settings.requirePinFinish);
+      document.getElementById('finishModal').classList.remove('hidden');
+    }
+
+    function closeFinishModal() {
+      document.getElementById('finishModal').classList.add('hidden');
+    }
+
+    function confirmFinishExam() {
+      if (settings.requirePinFinish) {
+        const pin = document.getElementById('finishPinInput').value.trim();
+        if (pin !== supervisorPin) {
+          document.getElementById('finishError').classList.remove('hidden');
+          return;
+        }
+      }
+
+      clearInterval(timerInterval);
+      clearInterval(heartbeatInterval);
+      stopSirenAlarm();
+      if (wakeLock) { wakeLock.release().catch(() => {}); wakeLock = null; }
+
+      examState.isActive = false;
+      examState.isLocked = false;
+      saveSessionState();
+
+      document.getElementById('examIframe').src = 'about:blank';
+      document.getElementById('finishModal').classList.add('hidden');
+      document.getElementById('examScreen').classList.add('hidden');
+      document.getElementById('startScreen').classList.remove('hidden');
+      alert("Sesi ujian telah selesai dengan aman.");
+    }
+
+    function openSettingsModal() {
+      document.getElementById('settingsAuthBox').classList.remove('hidden');
+      document.getElementById('settingsContentBox').classList.add('hidden');
+      document.getElementById('authPinInput').value = '';
+      document.getElementById('settingsModal').classList.remove('hidden');
+    }
+
+    function closeSettingsModal() {
+      document.getElementById('settingsModal').classList.add('hidden');
+    }
+
+    function verifySettingsPin() {
+      if (document.getElementById('authPinInput').value.trim() === supervisorPin) {
+        document.getElementById('settingsAuthBox').classList.add('hidden');
+        document.getElementById('settingsContentBox').classList.remove('hidden');
+        document.getElementById('cfgPin').value = supervisorPin;
+        document.getElementById('cfgTimer').value = settings.examDurationMinutes;
+        document.getElementById('cfgSiren').checked = settings.sirenSound;
+        document.getElementById('cfgDetectTab').checked = settings.detectTab;
+        document.getElementById('cfgDetectResize').checked = settings.detectResize;
+        document.getElementById('cfgRequirePinFinish').checked = settings.requirePinFinish;
+      } else {
+        alert("PIN Pengawas Salah!");
+      }
+    }
+
+    function saveSupervisorSettings() {
+      const newPin = document.getElementById('cfgPin').value.trim();
+      if (!newPin) return alert("PIN tidak boleh kosong!");
+      supervisorPin = newPin;
+      localStorage.setItem('exambro_pin', supervisorPin);
+
+      settings = {
+        examDurationMinutes: parseInt(document.getElementById('cfgTimer').value) || 0,
+        sirenSound: document.getElementById('cfgSiren').checked,
+        detectTab: document.getElementById('cfgDetectTab').checked,
+        detectResize: document.getElementById('cfgDetectResize').checked,
+        requirePinFinish: document.getElementById('cfgRequirePinFinish').checked
+      };
+      localStorage.setItem(STORAGE_KEY_CFG, JSON.stringify(settings));
+      alert("Pengaturan berhasil disimpan!");
+      closeSettingsModal();
+    }
+  </script>
+</body>
+</html>
